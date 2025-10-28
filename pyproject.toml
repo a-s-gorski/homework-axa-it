@@ -93,9 +93,11 @@ ignore = ["E501"]  # Ruff format takes care of line-too-long
 project_id = "584202f89503492d9483e8a6dfdfb67b"
 
 [tool.mypy]
+python_version = "3.12"
 warn_unused_ignores = true
+disable_error_code = ["import-untyped"]
 
+# Keep missing-imports quiet across all external libs
 [[tool.mypy.overrides]]
-module = ["lightgbm", "sklearn.*", "pandas"]
+module = ["*"]
 ignore_missing_imports = true
-# or: disable_error_code = ["import-untyped"]

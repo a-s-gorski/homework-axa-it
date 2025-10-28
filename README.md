@@ -1,100 +1,186 @@
-# mlstream
+# Mlstram - Kedro based package for practical Data Science Development
 
-[![Powered by Kedro](https://img.shields.io/badge/powered_by-kedro-ffc900?logo=kedro)](https://kedro.org)
+This repository contains a refactored and modular machine learning pipeline for data processing, model training and evaluation automatically.
 
-## Overview
 
-This is your new Kedro project, which was generated using `kedro 1.0.0`.
+The solution is implemented using **Kedro**, which provides standardized project structure, modular pipelines, and automatic artifact management. The project is designed to support collaboration between Data Scientists, Developers, and Technical Writers, ensuring reproducibility, code quality, and maintainable documentation.
 
-Take a look at the [Kedro documentation](https://docs.kedro.org) to get started.
+## Project Overview
 
-## Rules and guidelines
+**Key Features**
 
-In order to get the best out of the template:
+- Modular pipeline with reusable nodes for data ingestion, preprocessing, model training, and evaluation
 
-* Don't remove any lines from the `.gitignore` file we provide
-* Make sure your results can be reproduced by following a [data engineering convention](https://docs.kedro.org/en/stable/faq/faq.html#what-is-data-engineering-convention)
-* Don't commit data to your repository
-* Don't commit any credentials or your local configuration to your repository. Keep all your credentials and local configuration in `conf/local/`
+- Config-driven experimentation (no code edits required for new experiments)
 
-## How to install dependencies
+- Pre-commit hooks enforcing linting, formatting, type checking, and security scans
 
-Declare any dependencies in `requirements.txt` for `pip` installation.
+- Unit, integration, and end-to-end tests with CI integration
 
-To install them, run:
+- Auto-generated documentation with Sphinx and deployment to GitHub Pages
 
+- Custom Kedro dataset for .rda file handling
+
+- Environment reproducibility using pyproject.toml and optional virtual environment setup
+
+
+## For Data Scientists
+
+### 1. Environment Setup
+You can use either `venv` or `conda`.
+
+**Using venv:**
+
+```bash
+python -m venv .venv
+source .venv/bin/activate
+pip install -U pip
+pip install -e .[dev]
 ```
-pip install -r requirements.txt
+
+**Using conda:**
+```bash
+conda create -n kedro-env python=3.11
+conda activate kedro-env
+pip install -e .[dev]
 ```
 
-## How to run your Kedro pipeline
+This installs the project in editable mode (`-e .`) so that any code or configuration changes are immediately available.
 
-You can run your Kedro project with:
 
-```
+### 2. Project Configuration
+All configuration files are located under `conf/base/`:
+
+- `catalog.yml`: defines datasets, their types, file paths, and optional versioning  
+- `parameters.yml`: stores model hyperparameters and global constants  
+- `parameters/<pipeline>.yml`: stores pipeline-specific parameters (e.g., selected columns, Optuna search space, etc.)
+
+You can run the pipeline directly with:
+```bash
 kedro run
 ```
 
-## How to test your Kedro project
-
-Have a look at the files `tests/test_run.py` and `tests/pipelines/data_science/test_pipeline.py` for instructions on how to write your tests. Run the tests as follows:
-
-```
-pytest
+To run only specific nodes:
+```bash
+kedro run --node=preprocess_data
 ```
 
-You can configure the coverage threshold in your project's `pyproject.toml` file under the `[tool.coverage.report]` section.
+To modify experiment settings, simply update the relevant YAML file — no code changes are required.
 
-## Project dependencies
+### 3. Experiment Reproducibility
+Random seeds and deterministic options are stored in configuration files.  
+Artifacts (trained models, metrics, datasets) are versioned and saved automatically by Kedro.
 
-To see and update the dependency requirements for your project use `requirements.txt`. You can install the project requirements with `pip install -r requirements.txt`.
 
-[Further information about project dependencies](https://docs.kedro.org/en/stable/kedro_project_setup/dependencies.html#project-specific-dependencies)
+## For Technical Writers
 
-## How to work with Kedro and notebooks
+### 1. Building Documentation
+Documentation is built using **Sphinx** (configured via Kedro).
 
-> Note: Using `kedro jupyter` or `kedro ipython` to run your notebook provides these variables in scope: `catalog`, `context`, `pipelines` and `session`.
->
-> Jupyter, JupyterLab, and IPython are already included in the project requirements by default, so once you have run `pip install -r requirements.txt` you will not need to take any extra steps before you use them.
-
-### Jupyter
-To use Jupyter notebooks in your Kedro project, you need to install Jupyter:
-
-```
-pip install jupyter
+To generate HTML docs:
+```bash
+cd docs
+make html
 ```
 
-After installing Jupyter, you can start a local notebook server:
-
+The generated site will appear in:
 ```
-kedro jupyter notebook
-```
-
-### JupyterLab
-To use JupyterLab, you need to install it:
-
-```
-pip install jupyterlab
+docs/build/html/index.html
 ```
 
-You can also start JupyterLab:
-
-```
-kedro jupyter lab
-```
-
-### IPython
-And if you want to run an IPython session:
-
-```
-kedro ipython
+On Linux you can see the results locally using:
+```bash
+cd docs
+open docs/build/html/index.html
 ```
 
-### How to ignore notebook output cells in `git`
-To automatically strip out all output cell contents before committing to `git`, you can use tools like [`nbstripout`](https://github.com/kynan/nbstripout). For example, you can add a hook in `.git/config` with `nbstripout --install`. This will run `nbstripout` before anything is committed to `git`.
+After each merge request the docs will be automatically pushed to Github Pages and the result will be visible here:
+https://a-s-gorski.github.io/homework-axa-it/
 
-> *Note:* Your output cells will be retained locally.
 
-## Package your Kedro project
 
-[Further information about building project documentation and packaging your project](https://docs.kedro.org/en/stable/tutorial/package_a_project.html)
+### 3. Docstring Standards
+All modules use typed docstrings (NumPy style) and are automatically parsed by Sphinx’s autodoc extension, ensuring that new code is reflected in documentation builds without manual intervention.
+
+---
+
+
+## For Developers
+
+### 1. Code Quality and Pre-commit Hooks
+The project enforces strict code quality through **pre-commit**.  
+Install hooks once after environment setup:
+
+```bash
+pre-commit install
+```
+
+The hooks run automatically before each commit and include:
+- **Ruff** – linting and import sorting  
+- **Black** – code formatting  
+- **MyPy** – static type checking  
+- **Bandit** – security scanning  
+
+You can also run them manually:
+```bash
+pre-commit run --all-files
+```
+
+### 2. Testing
+Run all unit and integration tests with:
+```bash
+pytest --cov=src
+```
+
+Coverage reports are generated automatically.  
+Test datasets are stored under `data/test/`.
+
+### 3. Continuous Integration (CI/CD)
+CI is configured through **GitHub Actions**. Each pull request or push triggers:
+- Environment setup  
+- Static analysis (linting, typing, security)  
+- Unit and integration tests with coverage reports  
+
+Future CI/CD extensions (MLflow integration, environment-specific model promotion) can be added easily.
+
+### 4. Git Workflow
+- Create feature branches from `main`  
+- Commit frequently with meaningful messages  
+- Ensure all hooks and tests pass before pushing  
+- Submit pull requests for review
+- CI must pass for merge approval
+
+---
+
+## Project Structure
+
+```
+├── conf/                     # Configuration files (YAML)
+│   ├── base/
+│   │   ├── catalog.yml
+│   │   ├── parameters_data_processing.yml
+│   │   ├── parameters_data_science.yml
+│   │   ├── parameters_data_reporting.yml
+├── data/                     # Raw, intermediate, and output data
+├── docs/                     # Sphinx documentation
+├── scripts/                  # Utility scripts
+├── src/                      # Main Python source code
+│   ├── mlstream
+│   │   ├── pipelines/
+│   │   ├── nodes/
+│   │   ├── datasets/
+│   │   └── __init__.py
+├── tests/                    # Unit and integration tests
+├── pyproject.toml            # Project metadata and dependencies
+├── .pre-commit-config.yaml   # Pre-commit hooks
+├── .github/workflows/ci.yml  # CI configuration
+└── README.md
+```
+
+---
+
+## Future Idead
+- Integration with **MLflow** for experiment tracking and model versioning  
+- Environment-specific configuration (e.g., staging/production)  
+- Canary or batch deployment using Docker/Fargate  
+- Drift detection and retraining automation  

@@ -1,4 +1,3 @@
-# tests/pipelines/data_processing/test_dataframe_processor.py
 import logging
 
 import pandas as pd
@@ -9,8 +8,6 @@ from mlstream.pipelines.data_processing.dataframe_processor_config import (
     DataFrameProcessorConfig,
     TargetStrategy,
 )
-
-# ----------------------------- Config validation -----------------------------
 
 
 def test_config_threshold_rule_requires_threshold():
@@ -42,7 +39,6 @@ def test_config_binary_rule_normalization(rule):
     assert cfg.binary_rule == rule
 
 
-# ------------------------------- Helper factory ------------------------------
 
 
 def make_processor(**overrides) -> DataFrameProcessor:
@@ -58,7 +54,6 @@ def make_processor(**overrides) -> DataFrameProcessor:
     return DataFrameProcessor(cfg)
 
 
-# ---------------------------- Binary target rules ----------------------------
 
 
 def test_binary_nonzero_encoding():
@@ -87,7 +82,6 @@ def test_binary_mapping_with_fallback_and_invalid_replacement():
     assert out["target"].tolist() == [0, 1, 0, 0]
 
 
-# ---------------------------- Regression target ------------------------------
 
 
 def test_regression_target_with_invalid_replacement():
@@ -100,8 +94,6 @@ def test_regression_target_with_invalid_replacement():
     out = p.process(df)
     assert out["target"].tolist() == [1.2, -1.0, 3.0, -1.0]
 
-
-# ------------------------- FillNA before target logic ------------------------
 
 
 def test_fillna_happens_before_target_creation_with_threshold():
@@ -116,7 +108,6 @@ def test_fillna_happens_before_target_creation_with_threshold():
     assert out["target"].tolist() == [1, 0, 1]
 
 
-# ---------------------------- One-hot & dropping -----------------------------
 
 
 def test_one_hot_encoding_drops_original_and_joins_dummies():
@@ -163,7 +154,6 @@ def test_existing_target_without_source_is_preserved():
     assert out["target"].tolist() == [7, 8, 9]
 
 
-# ------------------------------- Validation logs -----------------------------
 
 
 def test_validate_logs_missing_and_extra_columns_and_dtype_warnings(caplog):

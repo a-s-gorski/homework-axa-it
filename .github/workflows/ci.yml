@@ -27,146 +27,146 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
-  # pre-commit:
-  #   name: pre-commit (fast local checks)
-  #   runs-on: ubuntu-latest
-  #   steps:
-  #     - uses: actions/checkout@v4
+  pre-commit:
+    name: pre-commit (fast local checks)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
 
-  #     - name: Set up Python
-  #       uses: actions/setup-python@v5
-  #       with:
-  #         python-version: "3.11"
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
 
-  #     - name: Install pre-commit
-  #       run: |
-  #         python -m pip install --upgrade pip
-  #         pip install pre-commit
+      - name: Install pre-commit
+        run: |
+          python -m pip install --upgrade pip
+          pip install pre-commit
 
-  #     - name: Run pre-commit
-  #       uses: pre-commit/action@v3.0.1
+      - name: Run pre-commit
+        uses: pre-commit/action@v3.0.1
 
-  # style-and-types:
-  #   name: scripts/check_style.sh
-  #   runs-on: ubuntu-latest
-  #   steps:
-  #     - uses: actions/checkout@v4
+  style-and-types:
+    name: scripts/check_style.sh
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
 
-  #     - name: Set up Python
-  #       uses: actions/setup-python@v5
-  #       with:
-  #         python-version: "3.11"
-  #         cache: "pip"
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: "pip"
 
-  #     - name: Install tools (black, isort, ruff, mypy, bandit)
-  #       run: |
-  #         python -m pip install --upgrade pip
-  #         pip install black isort ruff mypy bandit
+      - name: Install tools (black, isort, ruff, mypy, bandit)
+        run: |
+          python -m pip install --upgrade pip
+          pip install black isort ruff mypy bandit
 
-  #     - name: Make scripts executable (just in case)
-  #       run: |
-  #         chmod +x scripts/check_style.sh || true
-  #         chmod +x scripts/format.sh || true
+      - name: Make scripts executable (just in case)
+        run: |
+          chmod +x scripts/check_style.sh || true
+          chmod +x scripts/format.sh || true
 
-  #     - name: Run checks
-  #       env:
-  #         TARGETS: "src/mlstream"
-  #       run: ./scripts/check_style.sh
+      - name: Run checks
+        env:
+          TARGETS: "src/mlstream"
+        run: ./scripts/check_style.sh
 
-  # unit-tests:
-  #   name: unit tests (with coverage)
-  #   runs-on: ubuntu-latest
-  #   env:
-  #     MPLBACKEND: Agg
-  #     PIP_DISABLE_PIP_VERSION_CHECK: "1"
-  #     PYTHONDONTWRITEBYTECODE: "1"
-  #     PYTEST_ADDOPTS: "-ra"
-  #   steps:
-  #     - uses: actions/checkout@v4
+  unit-tests:
+    name: unit tests (with coverage)
+    runs-on: ubuntu-latest
+    env:
+      MPLBACKEND: Agg
+      PIP_DISABLE_PIP_VERSION_CHECK: "1"
+      PYTHONDONTWRITEBYTECODE: "1"
+      PYTEST_ADDOPTS: "-ra"
+    steps:
+      - uses: actions/checkout@v4
 
-  #     - name: Set up Python
-  #       uses: actions/setup-python@v5
-  #       with:
-  #         python-version: "3.11"
-  #         cache: "pip"
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: "pip"
 
-  #     - name: Install dependencies
-  #       run: |
-  #         python -m pip install --upgrade pip
-  #         # Try common extras; ignore failures if extras don't exist
-  #         pip install -e .[dev,test] || pip install -e .
-  #         pip install pytest pytest-cov
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          # Try common extras; ignore failures if extras don't exist
+          pip install -e .[dev,test] || pip install -e .
+          pip install pytest pytest-cov
 
-  #     - name: Make test scripts executable
-  #       run: |
-  #         chmod +x scripts/test_unit.sh || true
+      - name: Make test scripts executable
+        run: |
+          chmod +x scripts/test_unit.sh || true
 
-  #     - name: Run unit tests + coverage
-  #       run: ./scripts/test_unit.sh
+      - name: Run unit tests + coverage
+        run: ./scripts/test_unit.sh
 
-  #     - name: Upload HTML coverage as artifact
-  #       uses: actions/upload-artifact@v4
-  #       with:
-  #         name: htmlcov
-  #         path: htmlcov
-  #         if-no-files-found: warn
-  #         retention-days: 7
+      - name: Upload HTML coverage as artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: htmlcov
+          path: htmlcov
+          if-no-files-found: warn
+          retention-days: 7
 
-  #     - name: Generate coverage summary (Markdown)
-  #       uses: irongut/CodeCoverageSummary@v1.3.0
-  #       with:
-  #         filename: coverage.xml
-  #         badge: true
-  #         format: markdown
-  #         hide_complexity: true
-  #         indicators: true
-  #         output: file
-  #         thresholds: '60 80'
+      - name: Generate coverage summary (Markdown)
+        uses: irongut/CodeCoverageSummary@v1.3.0
+        with:
+          filename: coverage.xml
+          badge: true
+          format: markdown
+          hide_complexity: true
+          indicators: true
+          output: file
+          thresholds: '60 80'
 
-  #     - name: Attach coverage summary to job
-  #       run: |
-  #         echo "## Code Coverage" >> $GITHUB_STEP_SUMMARY
-  #         cat code-coverage-results.md >> $GITHUB_STEP_SUMMARY
+      - name: Attach coverage summary to job
+        run: |
+          echo "## Code Coverage" >> $GITHUB_STEP_SUMMARY
+          cat code-coverage-results.md >> $GITHUB_STEP_SUMMARY
 
-  #     - name: Upload coverage summary md
-  #       uses: actions/upload-artifact@v4
-  #       with:
-  #         name: coverage-summary
-  #         path: code-coverage-results.md
-  #         retention-days: 7
+      - name: Upload coverage summary md
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-summary
+          path: code-coverage-results.md
+          retention-days: 7
 
-  # # Optional: Manual, on-demand integration/e2e jobs (won't run automatically)
-  # on-demand-tests:
-  #   if: ${{ github.event_name == 'workflow_dispatch' && inputs.test_suite != 'unit' }}
-  #   name: on-demand ${{ inputs.test_suite }} tests
-  #   runs-on: ubuntu-latest
-  #   steps:
-  #     - uses: actions/checkout@v4
+  # Optional: Manual, on-demand integration/e2e jobs (won't run automatically)
+  on-demand-tests:
+    if: ${{ github.event_name == 'workflow_dispatch' && inputs.test_suite != 'unit' }}
+    name: on-demand ${{ inputs.test_suite }} tests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
 
-  #     - name: Set up Python
-  #       uses: actions/setup-python@v5
-  #       with:
-  #         python-version: "3.11"
-  #         cache: "pip"
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: "pip"
 
-  #     - name: Install dependencies
-  #       run: |
-  #         python -m pip install --upgrade pip
-  #         pip install -e .[dev,test] || pip install -e .
-  #         pip install pytest
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -e .[dev,test] || pip install -e .
+          pip install pytest
 
-  #     - name: Make test scripts executable
-  #       run: |
-  #         chmod +x scripts/test_integration.sh || true
-  #         chmod +x scripts/test_e2e.sh || true
+      - name: Make test scripts executable
+        run: |
+          chmod +x scripts/test_integration.sh || true
+          chmod +x scripts/test_e2e.sh || true
 
-  #     - name: Run integration tests
-  #       if: ${{ inputs.test_suite == 'integration' }}
-  #       run: ./scripts/test_integration.sh
+      - name: Run integration tests
+        if: ${{ inputs.test_suite == 'integration' }}
+        run: ./scripts/test_integration.sh
 
-  #     - name: Run e2e tests
-  #       if: ${{ inputs.test_suite == 'e2e' }}
-  #       run: ./scripts/test_e2e.sh
+      - name: Run e2e tests
+        if: ${{ inputs.test_suite == 'e2e' }}
+        run: ./scripts/test_e2e.sh
   docs:
       name: Build and Deploy Docs
       runs-on: ubuntu-latest

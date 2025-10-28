@@ -29,7 +29,7 @@ You may rewrite the code in whichever way you like, **as long as your choices ar
      - Source code (e.g., modules for data ingestion, preprocessing, model training, evaluation, and deployment) - DONE
      - Tests (unit and integration) - DONE
      - Configuration files and scripts - DONE
-     - Documentation and reporting - INPROGRESS
+     - Documentation and reporting - DONE
    - Use meaningful names for files and directories to clearly describe their content and purpose.
 
 2. **Code Refactoring & Quality**

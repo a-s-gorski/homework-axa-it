@@ -25,11 +25,11 @@ You may rewrite the code in whichever way you like, **as long as your choices ar
 
 1. **Project Structure & Organization**
    - Organize the refactored code into a well-defined project layout. Consider creating directories for:
-     - Data (raw data, model input, training/test data, metrics and artifacts)
-     - Source code (e.g., modules for data ingestion, preprocessing, model training, evaluation, and deployment)
-     - Tests (unit and integration)
-     - Configuration files and scripts
-     - Documentation and reporting
+     - Data (raw data, model input, training/test data, metrics and artifacts) - DONE
+     - Source code (e.g., modules for data ingestion, preprocessing, model training, evaluation, and deployment) - DONE
+     - Tests (unit and integration) - DONE
+     - Configuration files and scripts - DONE
+     - Documentation and reporting - INPROGRESS
    - Use meaningful names for files and directories to clearly describe their content and purpose.
 
 2. **Code Refactoring & Quality**

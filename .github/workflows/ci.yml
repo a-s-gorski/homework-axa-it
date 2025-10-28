@@ -17,6 +17,15 @@ on:
           - integration
           - e2e
 
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: "pages"
+  cancel-in-progress: false
+
 jobs:
   pre-commit:
     name: pre-commit (fast local checks)
@@ -68,7 +77,6 @@ jobs:
     name: unit tests (with coverage)
     runs-on: ubuntu-latest
     env:
-      # Prevent any GUI backends (e.g., matplotlib) from trying to open windows
       MPLBACKEND: Agg
       PIP_DISABLE_PIP_VERSION_CHECK: "1"
       PYTHONDONTWRITEBYTECODE: "1"
@@ -159,3 +167,47 @@ jobs:
       - name: Run e2e tests
         if: ${{ inputs.test_suite == 'e2e' }}
         run: ./scripts/test_e2e.sh
+  docs:
+      name: Build and Deploy Docs
+      runs-on: ubuntu-latest
+      needs: [style-and-types, unit-tests]
+      steps:
+        - uses: actions/checkout@v4
+
+        - name: Set up Python
+          uses: actions/setup-python@v5
+          with:
+            python-version: "3.11"
+            cache: "pip"
+
+        - name: Install doc dependencies
+          run: |
+            python -m pip install --upgrade pip
+            pip install -r docs/requirements.txt
+
+        # 🧩 Use your exact local command pattern
+        - name: Build HTML via Makefile
+          working-directory: docs
+          env:
+            MPLBACKEND: Agg
+          run: make html
+
+        - name: Setup Pages
+          uses: actions/configure-pages@v5
+
+        - name: Upload built site
+          uses: actions/upload-pages-artifact@v3
+          with:
+            path: docs/build/html
+
+  deploy:
+    name: Deploy to GitHub Pages
+    runs-on: ubuntu-latest
+    needs: docs
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Deploy
+        id: deployment
+        uses: actions/deploy-pages@v4

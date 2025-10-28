@@ -40,7 +40,8 @@ docs = [
     "sphinx_copybutton==0.5.2",
     "ipykernel>=5.3, <7.0",
     "Jinja2<3.2.0",
-    "myst-parser>=1.0,<2.1"
+    "myst-parser>=1.0,<2.1",
+    "sphinxcontrib-mermaid>=0.9"
 ]
 
 # ---- Dev tools (expanded so CI can do pip install .[dev]) ----

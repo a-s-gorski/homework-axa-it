@@ -170,7 +170,7 @@ jobs:
   docs:
       name: Build and Deploy Docs
       runs-on: ubuntu-latest
-      needs: [style-and-types, unit-tests]
+      # needs: [style-and-types, unit-tests]
       steps:
         - uses: actions/checkout@v4
 

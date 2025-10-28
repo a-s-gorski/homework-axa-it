@@ -1,3 +1,32 @@
+"""
+RdaDataset Module
+=================
+
+This module defines a custom Kedro dataset for loading `.rda` files (R data files)
+into pandas DataFrames. It leverages the `rdata` library to read serialized R objects
+and optionally saves them as CSV files for easier downstream use.
+
+Classes:
+--------
+- RdaDataset: Extends Kedro's AbstractDataset to handle R `.rda` file loading and
+  optional CSV export.
+
+Typical usage example:
+----------------------
+    >>> from my_project.datasets.rda_dataset import RdaDataset
+    >>> dataset = RdaDataset(filepath="data/pg15training.rda", object_name="pg15training")
+    >>> df = dataset.load()
+    >>> print(df.head())
+
+Features:
+---------
+- Validates existence of `.rda` file before loading.
+- Loads specific R objects by name from the file.
+- Optionally exports loaded data to CSV for external use.
+- Provides standard Kedro dataset metadata and logging support.
+
+"""
+
 import logging
 from pathlib import Path
 
@@ -19,7 +48,7 @@ class RdaDataset(AbstractDataset):
         """
         Args:
             filepath: Path to the local .rda file.
-            object_name: The name of the object inside the .rda (e.g. 'pg15training').
+            objsct_name: The name of the object inside the .rda (e.g. 'pg15training').
             output_directory: Optional directory to save the CSV version.
             version: Optional Kedro dataset version.
         """

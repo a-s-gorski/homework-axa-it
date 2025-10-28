@@ -1,3 +1,52 @@
+"""
+DataFrameProcessor
+==================
+
+Processor for pandas DataFrames driven by a Pydantic configuration
+(`DataFrameProcessorConfig`). This module implements a deterministic
+transformation pipeline:
+
+Pipeline
+--------
+1) Fill NA values using `columns_to_fillna`.
+2) Create/transform the target according to `target_strategy`
+   (supports BINARY and REGRESSION).
+3) One-hot encode columns listed in `columns_to_onehotencode`.
+4) Drop columns listed in `columns_to_drop` (never drops the final target).
+
+Key points
+----------
+- Runtime validation (`_validate`) performs light schema-ish checks and logs
+  problems/warnings without mutating data.
+- Binary targets support rules: {"nonzero", "threshold", "mapping"}.
+- Regression targets coerce to numeric; invalids can be replaced with
+  `invalid_target_replacement` if provided.
+- One-hot encoding drops original categorical columns and joins dummy columns
+  (with `drop_first=True` to avoid perfect multicollinearity).
+
+Example
+-------
+    cfg = DataFrameProcessorConfig(
+        columns_to_fillna={"age": 0},
+        columns_to_onehotencode=["country"],
+        columns_to_drop=["id"],
+        target_source="score",
+        target_name="label",
+        target_strategy=TargetStrategy.BINARY,
+        binary_rule="threshold",
+        binary_threshold=0.5,
+    )
+
+    proc = DataFrameProcessor(cfg)
+    df_out = proc.process(df_in)
+
+Notes
+-----
+- Validation logs missing/extra columns and non-categorical one-hot columns
+  (encoding still proceeds). Convert with `df[col] = df[col].astype("category")`
+  if you want stricter dtype control.
+"""
+
 from __future__ import annotations
 
 import logging

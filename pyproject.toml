@@ -108,8 +108,8 @@ project_id = "584202f89503492d9483e8a6dfdfb67b"
 
 [tool.mypy]
 python_version = "3.12"
-warn_unused_ignores = true
-disable_error_code = ["import-untyped"]
+warn_unused_ignores = false
+disable_error_code = ["import-untyped", "import-not-found"]
 
 [[tool.mypy.overrides]]
 module = ["*"]

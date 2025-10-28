@@ -1,3 +1,58 @@
+"""
+DataFrameProcessor Configurations
+=================================
+
+This module defines configuration models for the MLStream DataFrame processing
+pipeline, using Pydantic v2 for validation and normalization.
+
+Contents
+--------
+- `TargetStrategy`: Enum of supported target-generation strategies.
+- `DataFrameProcessorConfig`: Serializable config capturing column transforms
+  (drop, one-hot encode, fillna) and target derivation rules.
+
+Key behaviors
+-------------
+- `binary_rule` is normalized to one of: {"nonzero", "threshold", "mapping"}.
+- Cross-field checks enforce required params for BINARY targets:
+    * `threshold` rule -> `binary_threshold` must be set.
+    * `mapping` rule   -> `binary_mapping` must be non-empty.
+
+Example
+-------
+Basic nonzero rule:
+    >>> DataFrameProcessorConfig(
+    ...     columns_to_drop=["id"],
+    ...     columns_to_onehotencode=["country"],
+    ...     columns_to_fillna={"age": 0},
+    ...     target_source="label_raw",
+    ...     target_name="label",
+    ...     target_strategy=TargetStrategy.BINARY,
+    ...     binary_rule="nonzero",
+    ... )
+
+Threshold rule:
+    >>> DataFrameProcessorConfig(
+    ...     target_source="score",
+    ...     target_strategy=TargetStrategy.BINARY,
+    ...     binary_rule="threshold",
+    ...     binary_threshold=0.5,
+    ... )
+
+Mapping rule with fallback:
+    >>> DataFrameProcessorConfig(
+    ...     target_source="status",
+    ...     target_strategy=TargetStrategy.BINARY,
+    ...     binary_rule="mapping",
+    ...     binary_mapping={"OK": 0, "WARN": 1, "FAIL": 1},
+    ...     invalid_target_replacement=0,
+    ... )
+
+Serialization (e.g., to save with a run config):
+    >>> cfg = DataFrameProcessorConfig()
+    >>> cfg.model_dump()   # dict ready for YAML/JSON
+"""
+
 from __future__ import annotations
 
 from enum import Enum

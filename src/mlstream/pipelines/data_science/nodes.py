@@ -3,6 +3,7 @@ from typing import Any
 import pandas as pd
 from sklearn.model_selection import train_test_split
 
+from .mlflow_utils import mlflow_autolog_run
 from .models import retrieve_model_class as _get_model_class
 from .optuna_train import handle_optuna_search
 
@@ -44,6 +45,7 @@ def split_train_test(
     return X_train, X_val, y_train, y_val
 
 
+@mlflow_autolog_run()
 def train_or_search_model(
     X_train: pd.DataFrame,
     y_train: pd.Series,

@@ -23,6 +23,7 @@ dependencies = [
     "optuna>=3.0",         # optuna_train / trials
     "lightgbm>=4.0",       # models.py
     "rdata>=0.10",         # rda_dataset
+    "mlflow>=3.5.1,<4.0.0"
 ]
 
 [project.scripts]

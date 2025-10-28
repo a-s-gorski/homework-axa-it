@@ -184,3 +184,5 @@ Future CI/CD extensions (MLflow integration, environment-specific model promotio
 - Environment-specific configuration (e.g., staging/production)  
 - Canary or batch deployment using Docker/Fargate  
 - Drift detection and retraining automation  
+- This solution would not perform best with large size data - I would need partitioning or integration with Spark.
+- More advanced data validation (with Pandera)?

@@ -14,7 +14,7 @@ This solution provides my explanations and design decisions.
 
 - Several columns are dropped without clear explanation. Although they may contain many missing values, I’d prefer to see a correlation plot or feature importance analysis to justify these decisions.
 
-- One-hot encoding the Year feature doesn’t seem appropriate, even with low cardinality, as it discards temporal trends inherent in the data.
+- One-hot encoding the Year feature doesn’t seem appropriate, even with low cardinality, as it discards temporal trends in the data.
 
 - The resulting dataset becomes very high-dimensional. I would consider applying dimensionality reduction techniques, removing highly correlated features, or combining similar ones.
 
@@ -28,7 +28,7 @@ This solution provides my explanations and design decisions.
 
 1. **Project Structure & Organization**
 
-I selected Kedro as the framework because it enforces modular, reproducible pipelines, clear data lineage, and configuration separation — fully aligned with the task requirements.
+I selected Kedro as the framework because it enforces modular, reproducible pipelines, clear data lineage, and configuration separation — matching with the task requirements.
 Kedro provides standard directories for data/, src/, conf/, and tests/, with automatic artifact versioning and pipeline visualization.
 
 This project is implemented as a monorepo, which simplifies maintenance for this scale and use case.
@@ -80,6 +80,7 @@ All parameters and file paths are externalized into YAML configs:
 - catalog.yml defines data inputs/outputs and enables versioned storage (local or remote, e.g., S3).
 
 - parameters.yml and pipeline-specific configs define hyperparameters, column lists, and other runtime options.
+
 - This design allows Data Scientists to modify experiments entirely through configuration, without touching core code.
 
 6. **Documentation**
@@ -102,3 +103,36 @@ Planned enhancements include:
 - CI-level integration tests before merge for stronger release gating.
 
 - Additional steps in CI pipeline to build package and push to Github.
+
+7. **Model Serving and Deployment**
+
+The next logical step for this project would be model versioning and deployment.
+
+In a production workflow, I would typically manage deployment by promoting logged models from a model registry (e.g., MLflow). Depending on the type of model:
+
+For traditional ML models: Serve directly using MLflow Serve or similar tools.
+
+For deep learning models: Retrieve the model from MLflow, convert it to ONNX, and serve it via a FastAPI application with an ONNX runtime client.
+
+For the purpose of this project, I am using an example model to illustrate the workflow.
+
+Recommended Project Structure
+
+I would create a separate subpackage dedicated to deployment, with its own dependencies and lock file. This keeps the core project lightweight and ensures reproducibility in the deployment environment.
+
+Docker Best Practices
+
+When building a Docker image for serving models, I would follow these practices:
+
+- Use a non-root user for security.
+
+- Apply a multi-stage build to minimize image size and separate build/runtime dependencies.
+
+= Fetch the model from the model registry at runtime, rather than baking it into the image, to simplify model updates and versioning.
+
+- Include proper health checks and logging for monitoring and observability. For the healthchecks endpoint and fast async serving I would consider FastAPI with background jobs (for long-running classification tasks).
+
+
+- Define clear versioning of both models and APIs to ensure backward compatibility. API managment with V1/V2.
+
+- Include integration tests for the inference API to catch issues before deployment.

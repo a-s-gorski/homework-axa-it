@@ -179,7 +179,7 @@ Future CI/CD extensions (MLflow integration, environment-specific model promotio
 
 ---
 
-## Future Idead
+## Future Ideas
 - Integration with **MLflow** for experiment tracking and model versioning  
 - Environment-specific configuration (e.g., staging/production)  
 - Canary or batch deployment using Docker/Fargate  

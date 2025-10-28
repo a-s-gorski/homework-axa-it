@@ -5,7 +5,6 @@ import pytest
 from mlstream.pipelines.data_processing.nodes import preprocess_dataframe
 
 
-
 def test_parameters_type_guard():
     df = pd.DataFrame({"x": [1, 2]})
     with pytest.raises(TypeError, match="`parameters` must be a dict"):
@@ -15,13 +14,17 @@ def test_parameters_type_guard():
 def test_missing_target_source_raises_keyerror():
     df = pd.DataFrame({"other": [1, 2]})
     params = {
-        "target": {"source": "missing", "name": "y", "strategy": "binary", "rule": "nonzero"},
+        "target": {
+            "source": "missing",
+            "name": "y",
+            "strategy": "binary",
+            "rule": "nonzero",
+        },
         "drop_columns": [],
         "categorical_columns": [],
     }
     with pytest.raises(KeyError, match="Target source column 'missing' not found"):
         preprocess_dataframe(df, params)
-
 
 
 def test_binary_nonzero_rule():
@@ -70,7 +73,6 @@ def test_binary_mapping_with_invalid_replacement():
     assert out["y"].tolist() == [0, 1, 0, 0]
 
 
-
 def test_regression_with_invalid_replacement():
     df = pd.DataFrame({"val": ["1.2", "bad", 3.0, None]})
     params = {
@@ -81,7 +83,6 @@ def test_regression_with_invalid_replacement():
     }
     out = preprocess_dataframe(df, params)
     assert out["y"].tolist() == [1.2, -1.0, 3.0, -1.0]
-
 
 
 def test_fillna_applied_before_target_creation():
@@ -102,24 +103,31 @@ def test_fillna_applied_before_target_creation():
     assert out["y"].tolist() == [1, 0, 1]
 
 
-
 def test_one_hot_encoding_and_safe_drop():
     df = pd.DataFrame(
         {
-            "cat": ["A", "B", "C", "A"],  # not categorical dtype on purpose; still encodes
+            "cat": [
+                "A",
+                "B",
+                "C",
+                "A",
+            ],  # not categorical dtype on purpose; still encodes
             "x": [1, 2, 3, 4],
         }
     )
     params = {
         "target": {"source": "x", "name": "y", "strategy": "regression"},
-        "drop_columns": ["x", "y"],               # target must be protected from drop
-        "categorical_columns": ["cat"],           # will be one-hot encoded with drop_first=True
+        "drop_columns": ["x", "y"],  # target must be protected from drop
+        "categorical_columns": ["cat"],  # will be one-hot encoded with drop_first=True
     }
     out = preprocess_dataframe(df, params)
 
     # original 'cat' should be gone; dummies present (drop_first=True -> two columns)
     assert "cat" not in out.columns
-    assert set(col for col in out.columns if col.startswith("cat_")) == {"cat_B", "cat_C"}
+    assert set(col for col in out.columns if col.startswith("cat_")) == {
+        "cat_B",
+        "cat_C",
+    }
 
     # source 'x' dropped; target 'y' preserved
     assert "x" not in out.columns
@@ -128,6 +136,7 @@ def test_one_hot_encoding_and_safe_drop():
 
 
 # ------------------------------ Features filter ------------------------------
+
 
 def test_features_filter_keeps_only_requested_plus_target():
     df = pd.DataFrame(
@@ -141,7 +150,7 @@ def test_features_filter_keeps_only_requested_plus_target():
         "target": {"source": "a", "name": "y", "strategy": "regression"},
         "drop_columns": [],
         "categorical_columns": ["cat"],  # will add dummy(s)
-        "features": ["b"],               # keep only 'b' + 'y'
+        "features": ["b"],  # keep only 'b' + 'y'
     }
     out = preprocess_dataframe(df, params)
 

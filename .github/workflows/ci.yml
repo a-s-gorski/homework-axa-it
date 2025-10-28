@@ -5,6 +5,17 @@ on:
     branches: [ main, master ]
   pull_request:
     branches: [ "**" ]
+  workflow_dispatch:
+    inputs:
+      test_suite:
+        description: "Which tests to run (default runs unit in CI anyway)"
+        required: false
+        default: "unit"
+        type: choice
+        options:
+          - unit
+          - integration
+          - e2e
 
 jobs:
   pre-commit:
@@ -52,3 +63,99 @@ jobs:
         env:
           TARGETS: "src/mlstream"
         run: ./scripts/check_style.sh
+
+  unit-tests:
+    name: unit tests (with coverage)
+    runs-on: ubuntu-latest
+    env:
+      # Prevent any GUI backends (e.g., matplotlib) from trying to open windows
+      MPLBACKEND: Agg
+      PIP_DISABLE_PIP_VERSION_CHECK: "1"
+      PYTHONDONTWRITEBYTECODE: "1"
+      PYTEST_ADDOPTS: "-ra"
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: "pip"
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          # Try common extras; ignore failures if extras don't exist
+          pip install -e .[dev,test] || pip install -e .
+          pip install pytest pytest-cov
+
+      - name: Make test scripts executable
+        run: |
+          chmod +x scripts/test_unit.sh || true
+
+      - name: Run unit tests + coverage
+        run: ./scripts/test_unit.sh
+
+      - name: Upload HTML coverage as artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: htmlcov
+          path: htmlcov
+          if-no-files-found: warn
+          retention-days: 7
+
+      - name: Generate coverage summary (Markdown)
+        uses: irongut/CodeCoverageSummary@v1.3.0
+        with:
+          filename: coverage.xml
+          badge: true
+          format: markdown
+          hide_complexity: true
+          indicators: true
+          output: file
+          thresholds: '60 80'
+
+      - name: Attach coverage summary to job
+        run: |
+          echo "## Code Coverage" >> $GITHUB_STEP_SUMMARY
+          cat code-coverage-results.md >> $GITHUB_STEP_SUMMARY
+
+      - name: Upload coverage summary md
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-summary
+          path: code-coverage-results.md
+          retention-days: 7
+
+  # Optional: Manual, on-demand integration/e2e jobs (won't run automatically)
+  on-demand-tests:
+    if: ${{ github.event_name == 'workflow_dispatch' && inputs.test_suite != 'unit' }}
+    name: on-demand ${{ inputs.test_suite }} tests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: "pip"
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -e .[dev,test] || pip install -e .
+          pip install pytest
+
+      - name: Make test scripts executable
+        run: |
+          chmod +x scripts/test_integration.sh || true
+          chmod +x scripts/test_e2e.sh || true
+
+      - name: Run integration tests
+        if: ${{ inputs.test_suite == 'integration' }}
+        run: ./scripts/test_integration.sh
+
+      - name: Run e2e tests
+        if: ${{ inputs.test_suite == 'e2e' }}
+        run: ./scripts/test_e2e.sh

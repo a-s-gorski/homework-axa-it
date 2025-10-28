@@ -21,7 +21,7 @@ You may incorporate whichever tool you like, **as long as your choices are justi
 
 You may rewrite the code in whichever way you like, **as long as your choices are justified**.
 
-## Guidelines 
+## Guidelines
 
 1. **Project Structure & Organization**
    - Organize the refactored code into a well-defined project layout. Consider creating directories for:
@@ -34,7 +34,7 @@ You may rewrite the code in whichever way you like, **as long as your choices ar
 
 2. **Code Refactoring & Quality**
    - Decompose the notebook into modular parts where each module (or function) has a single objective.
-   - Adhere to best coding practices and style guides. Implement tools such as `Ruff` to enforce code quality standards. 
+   - Adhere to best coding practices and style guides. Implement tools such as `Ruff` to enforce code quality standards.
 
 3. **Reproducibility**
    - Provide a way to lock down all development and regular dependencies.

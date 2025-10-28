@@ -7,19 +7,23 @@ from mlstream.pipelines.data_science.optuna_train import handle_optuna_search
 
 class FakeTrial:
     """Simple trial that just carries a number."""
+
     def __init__(self, number: int):
         self.number = number
 
 
 class FakeStudy:
     """Drop-in for optuna Study that calls the objective N times and records the best."""
+
     def __init__(self, direction: str = "maximize"):
         assert direction in ("maximize", "minimize")
         self.direction = direction
         self.best_value = None
         self.best_params = {}
         self.trials = []
-        self._comp = (lambda a, b: a > b) if direction == "maximize" else (lambda a, b: a < b)
+        self._comp = (
+            (lambda a, b: a > b) if direction == "maximize" else (lambda a, b: a < b)
+        )
 
     def optimize(self, objective, n_trials: int, show_progress_bar: bool = False):
         for i in range(int(n_trials)):
@@ -57,7 +61,6 @@ class RecorderModel:
 _LAST_SUGGESTED_PARAMS = {}
 
 
-
 @pytest.fixture
 def toy_split():
     # Simple 1-D feature; y = (x > 0)
@@ -68,10 +71,13 @@ def toy_split():
     return X_train, y_train, X_val, y_val
 
 
-
 def test_handle_optuna_search_returns_best_params_and_value(monkeypatch, toy_split):
     # Stub optuna.create_study -> FakeStudy
-    monkeypatch.setattr(optuna_mod.optuna, "create_study", lambda direction="maximize": FakeStudy(direction))
+    monkeypatch.setattr(
+        optuna_mod.optuna,
+        "create_study",
+        lambda direction="maximize": FakeStudy(direction),
+    )
 
     # Stub _suggest_from_space so trial 0 is bad (flip=1), trial 1 is good (flip=0)
     def stub_suggest(trial, space):
@@ -113,7 +119,11 @@ def test_handle_optuna_search_returns_best_params_and_value(monkeypatch, toy_spl
 
 def test_unsupported_metric_raises(monkeypatch, toy_split):
     # Ensure objective raises and bubbles up when metric is unsupported
-    monkeypatch.setattr(optuna_mod.optuna, "create_study", lambda direction="maximize": FakeStudy(direction))
+    monkeypatch.setattr(
+        optuna_mod.optuna,
+        "create_study",
+        lambda direction="maximize": FakeStudy(direction),
+    )
 
     def stub_suggest(trial, space):
         global _LAST_SUGGESTED_PARAMS

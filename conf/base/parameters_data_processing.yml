@@ -1,0 +1,96 @@
+preprocess:
+  target:
+    # source: Column in the raw DataFrame to derive the target from.
+    source: Numtppd
+
+    # name: Name of the target column to create.
+    name: target
+
+    # strategy: How to create/validate the target.
+    #   - binary: produce 0/1 labels.
+    #   - multiclass: # TODO - not yet implemented
+    #   - regression: numeric target (processor coerces to float; fill invalids if configured)
+    strategy: binary
+
+    # rule (binary only): How to turn source values into {0,1}.
+    #   - nonzero: 1 if value != 0 else 0
+    #   - threshold: 1 if value > threshold else 0
+    #   - mapping: look up value in `mapping` (unmapped values can fall back)
+    rule: nonzero
+
+    # threshold: Used only when rule: threshold
+    # threshold: 0.0
+
+    # mapping: Used only when rule: mapping. Keys are raw values, values are 0/1 labels.
+    # mapping:
+    #   OK: 0
+    #   WARN: 1
+    #   FAIL: 1
+
+    # invalid_target_replacement: Optional fallback for invalid/unmapped values (binary/regression).
+    # invalid_target_replacement: 0
+
+  # drop_columns: Columns to remove AFTER target creation
+  # (the processor will never drop the final target even if listed here).
+  drop_columns:
+    - Numtppd
+    - Numtpbi
+    - Indtppd
+    - Indtpbi
+
+  # categorical_columns: Columns to one-hot encode via get_dummies.
+  categorical_columns:
+    - CalYear
+    - Gender
+    - Type
+    - Category
+    - Occupation
+    - SubGroup2
+    - Group2
+    - Group1
+
+
+  # fillna: Per-column NA imputation BEFORE encoding/target creation.
+  # fillna:
+  #   Occupation: "UNK"
+  #   Bonus: 0
+  #   Age: 0
+
+  # features: If provided, keep ONLY these columns plus the target at the end.
+  #           Useful to align the design matrix with a training recipe.
+  # features:
+  #   - engines
+  #   - passenger_capacity
+  #   - crew
+  #   - d_check_complete
+  #   - moon_clearance_complete
+  #   - iata_approved
+  #   - company_rating
+  #   - review_scores_rating
+
+  # Example: binary by threshold
+  # target:
+  #   source: claim_amount
+  #   name: is_large_claim
+  #   strategy: binary
+  #   rule: threshold
+  #   threshold: 1000.0
+
+  # Example: binary by mapping
+  # target:
+  #   source: status
+  #   name: is_negative
+  #   strategy: binary
+  #   rule: mapping
+  #   mapping:
+  #     OK: 0
+  #     WARN: 1
+  #     FAIL: 1
+  #   invalid_target_replacement: 0  # fallback for unseen labels
+
+  # Example: regression target with NA fallback
+  # target:
+  #   source: LossAmount
+  #   name: target
+  #   strategy: regression
+  #   # invalid_target_replacement: 0.0

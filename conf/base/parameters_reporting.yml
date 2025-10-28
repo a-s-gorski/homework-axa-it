@@ -1,0 +1,2 @@
+cm_labels: null          # e.g. [0, 1] or ["neg", "pos"]
+cm_normalize: null       # one of: null, "true", "pred", "all"

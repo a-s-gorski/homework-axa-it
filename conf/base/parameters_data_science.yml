@@ -1,0 +1,102 @@
+model_options:
+  target_column: 'target'
+  test_size: 0.3
+  random_state: 42
+  stratify: True
+
+modeling:
+  # Which model to instantiate. Your _get_model_class() should map names like:
+  #   lightgbm -> lightgbm.LGBMClassifier
+  #   random_forest -> sklearn.ensemble.RandomForestClassifier
+  #   logreg -> sklearn.linear_model.LogisticRegression
+  model:
+    type: lightgbm
+    params:
+      objective: binary
+      n_estimators: 120
+      learning_rate: 0.05
+      max_depth: 6
+      num_leaves: 31
+      min_child_samples: 20
+      subsample: 0.8
+      colsample_bytree: 0.8
+      n_jobs: -1
+      verbosity: -1
+
+  # Metric used for evaluation inside search (if enabled).
+  # Your node currently supports "accuracy". Extend in code if needed.
+  metric: accuracy
+
+  # Search block is present but disabled. The node will train directly using model.params.
+  search:
+    enabled: false          # <-- direct training (no Optuna)
+    n_trials: 20            # ignored when enabled=false
+    direction: maximize     # ignored when enabled=false
+    test_size: 0.2          # inner validation split during search (ignored when enabled=false)
+    space: {}               # ignored when enabled=false
+
+
+# ======================================================================
+# ALTERNATIVE (COMMENTED): Enable Optuna hyperparameter search instead
+# Toggle by commenting OUT the active `modeling` above and un-commenting
+# everything below.
+# ======================================================================
+# modeling:
+#   model:
+#     type: lightgbm
+#     # Base params act as defaults; suggested params from search will override these.
+#     params:
+#       objective: binary
+#       n_jobs: -1
+#       verbosity: -1
+#
+#   metric: accuracy
+#
+#   search:
+#     enabled: true
+#     n_trials: 20
+#     direction: maximize
+#     test_size: 0.2     # inner split for validation inside the Optuna objective
+#     # Define the search space. Supported types in code: int | float | categorical
+#     space:
+#       n_estimators:       { type: int,   low: 50,    high: 300 }
+#       learning_rate:      { type: float, low: 0.001, high: 0.3,  log: true }
+#       max_depth:          { type: int,   low: 3,     high: 10 }
+#       num_leaves:         { type: int,   low: 20,    high: 150 }
+#       min_child_samples:  { type: int,   low: 5,     high: 100 }
+#       subsample:          { type: float, low: 0.5,   high: 1.0 }
+#       colsample_bytree:   { type: float, low: 0.5,   high: 1.0 }
+#
+# # Example alternative model (Random Forest):
+# # modeling:
+# #   model:
+# #     type: random_forest
+# #     params:
+# #       n_estimators: 300
+# #       max_depth: 12
+# #       min_samples_split: 2
+# #       min_samples_leaf: 1
+# #       n_jobs: -1
+# #   metric: accuracy
+# #   search:
+# #     enabled: true
+# #     n_trials: 25
+# #     direction: maximize
+# #     test_size: 0.2
+# #     space:
+# #       n_estimators:      { type: int,   low: 100, high: 600 }
+# #       max_depth:         { type: int,   low: 4,   high: 20 }
+# #       min_samples_split: { type: int,   low: 2,   high: 20 }
+# #       min_samples_leaf:  { type: int,   low: 1,   high: 10 }
+#
+# # Example logistic regression (no search)
+# # modeling:
+# #   model:
+# #     type: logreg
+# #     params:
+# #       solver: liblinear
+# #       max_iter: 200
+# #       C: 1.0
+# #   metric: accuracy
+# #   search:
+# #     enabled: false
